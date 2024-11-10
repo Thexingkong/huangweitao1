@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化后的加载高德地图</title>
+    <style>
+        html,
+        body,
+        #mapContainer {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: "83bb2e7abf18580e03be8a7f2fc1cbe8",
+        };
+    </script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=97ca63af27a77b4797bff465fc0b5bbb"></script>
+</head>
+
+<body>
+    <div id="mapContainer"></div>
+    <script>
+        const mapCenter = [102.760536, 25.059855];
+        const mapZoom = 16.5;
+        const iconPath = './1.jpg';
+        const infoWindowStyle = {
+            offset: new AMap.Pixel(0, -30),
+            minWidth: 200
+        };
+
+        // 创建地图实例
+        const map = new AMap.Map('mapContainer', {
+            center: mapCenter,
+            mapStyle: "amap://styles/default",
+            zoom: mapZoom,
+            viewMode: '2D',
+            pitch: 45
+        });
+
+        // 创建标记点函数
+        function createMarker(locationName, position) {
+            const icon = new AMap.Icon({
+                size: new AMap.Size(30, 30),
+                image: iconPath,
+                imageSize: new AMap.Size(30, 30)
+            });
+            const marker = new AMap.Marker({
+                position: position,
+                title: locationName,
+                icon: icon
+            });
+            const label = new AMap.Text({
+                text: locationName,
+                position: marker.getPosition(),
+                offset: new AMap.Pixel(0, -20)
+            });
+            map.add(label);
+            return marker;
+        }
+
+        // 创建信息窗口函数
+        function createInfoWindow(locationName, description) {
+            return new AMap.InfoWindow({
+                content: `<h3>${locationName}</h3><p>${description}</p>`,
+             ...infoWindowStyle
+            });
+        }
+
+        // 创建地点标记和信息窗口
+        function createLocation(locationName, position, description) {
+            const marker = createMarker(locationName, position);
+            const infoWindow = createInfoWindow(locationName, description);
+            marker.on('click', () => {
+                infoWindow.open(map, marker.getPosition());
+            });
+            map.add(marker);
+            return marker;
+        }
+
+        // 地点信息数组
+        const locations = [
+            { name: '第一教学楼', position: [102.758799, 25.060301], description: '这里是第一教学楼，' },
+            { name: '北图书馆', position: [102.757977, 25.061454], description: '这里是北图书馆。' },
+            { name: '第二教学楼', position: [102.756879, 25.061547], description: '这是第二教学楼。' },
+            { name: '第一食堂', position: [102.759064, 25.061776], description: '这是第一食堂。' },
+            { name: '第二食堂', position: [102.758103, 25.062613], description: '这是第二食堂。' },
+            { name: '竹苑5栋', position: [102.755962, 25.061865], description: '这是竹苑5栋。' },
+            { name: '立德楼', position: [102.754989, 25.058016], description: '这是立德楼。' },
+            { name: '智华楼', position: [102.755191, 25.057342], description: '这是智华楼。' },
+            { name: '致知楼', position: [102.753838, 25.057888], description: '这是致知楼。' },
+            { name: '经管楼', position: [102.754151, 25.056888], description: '这是经管楼。' },
+            { name: '土木楼', position: [102.754714, 25.056781], description: '这是土木楼。' },
+            { name: '文法楼', position: [102.755646, 25.056597], description: '这是文法楼' },
+            { name: '生物楼', position: [102.757095, 25.056263], description: '这是生物楼。' },
+            { name: '第二图书馆', position: [102.757471, 25.056981], description: '这是第二图书馆。' },
+            { name: '至诚楼', position: [102.758808, 25.05716], description: '这是至诚楼。' },
+            { name: '园林楼', position: [102.759904, 25.059178], description: '这是园林楼。' },
+            { name: '林工楼', position: [102.757803, 25.05923], description: '这是林工楼。' },
+            { name: '林学楼', position: [102.756939, 25.062424], description: '这是林学楼。' },
+            { name: '信息楼', position: [102.759788, 25.060382], description: '这是信息楼。' },
+            { name: '体育馆', position: [102.7621, 25.06151], description: '这是体育馆。' },
+            { name: '菜鸟驿站', position: [102.762959, 25.06031], description: '这是菜鸟驿站。' },
+            { name: '茶苑餐厅', position: [102.756554, 25.057892], description: '这是茶苑餐厅。' },
+            { name: '第四食堂', position: [102.761788, 25.058597], description: '这是第四食堂。' },
+            { name: '松苑', position: [102.760712, 25.061466], description: '这是松苑。' },
+            { name: '橡苑', position: [102.763257, 25.057519], description: '这是橡苑。' },
+            { name: '篮球场', position: [102.760575, 25.062488], description: '这是篮球场。' },
+            { name: '足球场', position: [102.761959, 25.062873], description: '这是足球场。' },
+             { name: '工学楼', position: [102.762817, 25.062513], description: '这是工学楼。' },
+        ];
+
+        // 自动创建多个地点标记和信息窗口
+        locations.forEach(location => {
+            createLocation(location.name, location.position, location.description);
+        });
+
+        // 添加地图工具插件
+        AMap.plugin(['AMap.ToolBar', 'AMap.Scale', 'AMap.Geolocation', 'AMap.ControlBar', 'AMap.HawkEye'], () => {
+            const toolbarOptions = { position: { left: '5px', top: '5px' } };
+            const scaleOptions = { position: { left: '10px', bottom: '50px' } };
+            const hawkEyeOptions = { position: { right: '23px', bottom: '20px' } };
+            const geolocationOptions = { position: { left: '130px', bottom: '60px' } };
+            const controlBarOptions = { position: { right: '140px', top: '5px' } };
+
+            const toolbar = new AMap.ToolBar(toolbarOptions);
+            const scale = new AMap.Scale(scaleOptions);
+            const hawkEye = new AMap.HawkEye(hawkEyeOptions);
+            const geolocation = new AMap.Geolocation(geolocationOptions);
+            const controlBar = new AMap.ControlBar(controlBarOptions);
+
+            // 使用数组遍历添加控制
+            [toolbar, scale, geolocation, controlBar, hawkEye].forEach(control => map.addControl(control));
+        });
+
+        // 驾车导航
+        AMap.plugin("AMap.Driving", () => {
+            const startPoint = [102.756674, 25.059759];
+            const endPoint = [102.763834, 25.062877];
+            const waypoints = [[102.760238, 25.059816]];
+            const drivingInstance = new AMap.Driving({
+                map: map,
+                policy: 0
+            });
+            drivingInstance.search(startPoint, endPoint, { waypoints }, (status, result) => {
+                if (status === 'complete') {
+                    // 查询成功时的处理逻辑
+                } else if (status === 'no_data') {
+                    // 查询无结果时的处理逻辑
+                } else {
+                    // 查询错误时的处理逻辑
+                }
+            });
+        });
+
+        // 绘制初始路径
+        const path = [];
+        path.push([102.756725, 25.059739]);
+        path.push([102.761836, 25.060984]);
+        path.push([102.763799, 25.062879]);
+        map.plugin("AMap.DragRoute", () => {
+            const route = new AMap.DragRoute(map, path, AMap.DrivingPolicy.LEAST_FEE);
+            route.search();
+        });
+    </script>
+</body>
+
+</html>
